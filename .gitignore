@@ -1,0 +1,10 @@
+## IDEA
+.idea/*
+## File-based project format
+*.ipr
+*.iws
+*.iml
+
+## composer
+vendor/
+composer.phar

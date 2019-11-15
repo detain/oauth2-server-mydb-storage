@@ -1,0 +1,21 @@
+{
+  "name": "detain/oauth2-server-mydb-storage",
+  "description": "Implementation of thephpleague oauth2 server storage interfaces for PDO storage",
+  "minimum-stability": "stable",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Joe Huss"
+    }
+  ],
+  "autoload": {
+    "psr-4": {"Detain\\OAuth2\\Server\\Storage\\PDO\\" : "src"}
+  },
+  "require": {
+    "league/oauth2-server": "^4.1",
+    "ext-pdo": "*"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^4.0"
+  }
+}
