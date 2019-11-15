@@ -9,36 +9,39 @@ storage interfaces for MyDb\Generic Storage.
 ```php
 use Detain\OAuth2\Server\Storage\MyDb\AccessTokenStorage;
 use Detain\OAuth2\Server\Storage\MyDb\ClientStorage;
-use Detain\OAuth2\Server\Storage\MyDb\AuthCodeStorage;
-use Detain\OAuth2\Server\Storage\MyDb\RefreshTokenStorage;
 use Detain\OAuth2\Server\Storage\MyDb\ScopeStorage;
 use Detain\OAuth2\Server\Storage\MyDb\SessionsStorage;
+use Detain\OAuth2\Server\Storage\MyDb\AuthCodeStorage;
+use Detain\OAuth2\Server\Storage\MyDb\RefreshTokenStorage;
+use League\OAuth2\Server\ResourceServer;
+use MyDb\Mysqli\Db;
 
-$db = new MyDb\Generic();
+$db = new Db();
 
 $sessionStorage = new SessionStorage($db);
 $accessTokenStorage = new AccessTokenStorage($db);
 $clientStorage = new ClientStorage($db);
 $scopeStorage = new ScopeStorage($db);
 
-$server = new ResourceServer(
-	$sessionStorage,
-	$accessTokenStorage,
-	$clientStorage,
-	$scopeStorage
-);
-//…
+$server = new ResourceServer($sessionStorage, $accessTokenStorage, $clientStorage, $scopeStorage);
 ```
 
 Once you have an instance of `League\OAuth2\Server\AuthorizationServer` you can set the different storages.
 
 ```php
-$server->setClientStorage(new Detain\OAuth2\Server\Storage\MyDb\ClientStorage($db));
-$server->setSessionStorage(new Detain\OAuth2\Server\Storage\MyDb\SessionStorage($db));
-$server->setAccessTokenStorage(new Detain\OAuth2\Server\Storage\MyDb\AccessTokenStorage($db));
-$server->setRefreshTokenStorage(new Detain\OAuth2\Server\Storage\MyDb\RefreshTokenStorageStorage($db));
-$server->setAuthCodeStorage(new Detain\OAuth2\Server\Storage\MyDb\AuthCodeStorage($db));
-$server->setScopeStorage(new Detain\OAuth2\Server\Storage\MyDb\ScopeStorage($db));
+use Detain\OAuth2\Server\Storage\MyDb\AccessTokenStorage;
+use Detain\OAuth2\Server\Storage\MyDb\ClientStorage;
+use Detain\OAuth2\Server\Storage\MyDb\ScopeStorage;
+use Detain\OAuth2\Server\Storage\MyDb\SessionsStorage;
+use Detain\OAuth2\Server\Storage\MyDb\AuthCodeStorage;
+use Detain\OAuth2\Server\Storage\MyDb\RefreshTokenStorage;
+
+$server->setAccessTokenStorage(new AccessTokenStorage($db));
+$server->setClientStorage(new ClientStorage($db));
+$server->setScopeStorage(new ScopeStorage($db));
+$server->setSessionStorage(new SessionStorage($db));
+$server->setAuthCodeStorage(new AuthCodeStorage($db));
+$server->setRefreshTokenStorage(new RefreshTokenStorageStorage($db));
 ```
 
 ## Installation
