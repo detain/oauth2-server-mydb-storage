@@ -1,6 +1,6 @@
 <?php
-use Detain\OAuth2\Server\Storage\MyDb\ClientStorage;
-use Detain\OAuth2\Server\Storage\MyDb\SessionStorage;
+use Detain\OAuth2\Server\Repository\MyDb\ClientRepository;
+use Detain\OAuth2\Server\Repository\MyDb\SessionRepository;
 use League\Event\Emitter;
 use League\OAuth2\Server\AbstractServer;
 use League\OAuth2\Server\Entity\AccessTokenEntity;
@@ -27,10 +27,10 @@ class PDOMock extends MyDb\Generic
  * Date: 16.03.16
  * Time: 10:27
  */
-class SessionStorageTest extends MyDbTest
+class SessionRepositoryTest extends MyDbTest
 {
 	/**
-	 * @var SessionStorage
+	 * @var SessionRepository
 	 */
 	protected $session;
 	/**
@@ -40,7 +40,7 @@ class SessionStorageTest extends MyDbTest
 	/**
 	 * @var PHPUnit_Framework_MockObject_MockObject
 	 */
-	protected $clientStorage;
+	protected $clientRepository;
 
 	public function testGetByAccessTokenFail()
 	{
@@ -64,7 +64,7 @@ class SessionStorageTest extends MyDbTest
 
 		$session = $this->session->getByAccessToken($accessToken);
 
-		$this->clientStorage->expects($this->once())->method('getBySession')->with($session)->willReturn([''=>$client]);
+		$this->clientRepository->expects($this->once())->method('getBySession')->with($session)->willReturn([''=>$client]);
 		$this->assertEquals(19, $session->getId());
 		$this->assertEquals("user", $session->getOwnerType());
 		$this->assertEquals(3, $session->getOwnerId());
@@ -91,7 +91,7 @@ class SessionStorageTest extends MyDbTest
 
 		$session = $this->session->getByAuthCode($authCode);
 
-		$this->clientStorage->expects($this->once())->method('getBySession')->with($session)->willReturn([''=>$client]);
+		$this->clientRepository->expects($this->once())->method('getBySession')->with($session)->willReturn([''=>$client]);
 		$this->assertEquals(19, $session->getId());
 		$this->assertEquals("user", $session->getOwnerType());
 		$this->assertEquals(3, $session->getOwnerId());
@@ -192,11 +192,11 @@ class SessionStorageTest extends MyDbTest
 	{
 		parent::setUp();
 
-		$this->session = new SessionStorage($this->db);
+		$this->session = new SessionRepository($this->db);
 		$this->server = $this->getMock(AbstractServer::class);
 		$this->server->method('getEventEmitter')->willReturn(new Emitter());
-		$this->clientStorage = $this->getMockBuilder(ClientStorage::class)->disableOriginalConstructor()->getMock();
-		$this->server->method('getClientStorage')->willReturn($this->clientStorage);
+		$this->clientRepository = $this->getMockBuilder(ClientRepository::class)->disableOriginalConstructor()->getMock();
+		$this->server->method('getClientRepository')->willReturn($this->clientRepository);
 
 		$this->session->setServer($this->server);
 	}

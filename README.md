@@ -1,47 +1,47 @@
-# MyDb\Generic Storage for thephpleague oauth2 server
+# MyDb\Generic Repository for thephpleague oauth2 server
 [![Travis branch](https://img.shields.io/travis/detain/oauth2-server-mydb-storage/master.svg?style=flat-square)](https://travis-ci.org/detain/oauth2-server-mydb-storage) [![Codecov](https://img.shields.io/codecov/c/github/detain/oauth2-server-mydb-storage.svg?style=flat-square)](https://codecov.io/github/detain/oauth2-server-mydb-storage?branch=master) [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
 
 This is an Implentation of the [thephpleague/oauth2-server](https://github.com/thephpleague/oauth2-server/) 
-storage interfaces for MyDb\Generic Storage.
+storage interfaces for MyDb\Generic Repository.
 
 ## Usage
 
 ```php
-use Detain\OAuth2\Server\Storage\MyDb\AccessTokenStorage;
-use Detain\OAuth2\Server\Storage\MyDb\ClientStorage;
-use Detain\OAuth2\Server\Storage\MyDb\ScopeStorage;
-use Detain\OAuth2\Server\Storage\MyDb\SessionsStorage;
-use Detain\OAuth2\Server\Storage\MyDb\AuthCodeStorage;
-use Detain\OAuth2\Server\Storage\MyDb\RefreshTokenStorage;
+use Detain\OAuth2\Server\Repository\MyDb\AccessTokenRepository;
+use Detain\OAuth2\Server\Repository\MyDb\ClientRepository;
+use Detain\OAuth2\Server\Repository\MyDb\ScopeRepository;
+use Detain\OAuth2\Server\Repository\MyDb\SessionsRepository;
+use Detain\OAuth2\Server\Repository\MyDb\AuthCodeRepository;
+use Detain\OAuth2\Server\Repository\MyDb\RefreshTokenRepository;
 use League\OAuth2\Server\ResourceServer;
 use MyDb\Mysqli\Db;
 
 $db = new Db();
 
-$sessionStorage = new SessionStorage($db);
-$accessTokenStorage = new AccessTokenStorage($db);
-$clientStorage = new ClientStorage($db);
-$scopeStorage = new ScopeStorage($db);
+$sessionRepository = new SessionRepository($db);
+$accessTokenRepository = new AccessTokenRepository($db);
+$clientRepository = new ClientRepository($db);
+$scopeRepository = new ScopeRepository($db);
 
-$server = new ResourceServer($sessionStorage, $accessTokenStorage, $clientStorage, $scopeStorage);
+$server = new ResourceServer($sessionRepository, $accessTokenRepository, $clientRepository, $scopeRepository);
 ```
 
 Once you have an instance of `League\OAuth2\Server\AuthorizationServer` you can set the different storages.
 
 ```php
-use Detain\OAuth2\Server\Storage\MyDb\AccessTokenStorage;
-use Detain\OAuth2\Server\Storage\MyDb\ClientStorage;
-use Detain\OAuth2\Server\Storage\MyDb\ScopeStorage;
-use Detain\OAuth2\Server\Storage\MyDb\SessionsStorage;
-use Detain\OAuth2\Server\Storage\MyDb\AuthCodeStorage;
-use Detain\OAuth2\Server\Storage\MyDb\RefreshTokenStorage;
+use Detain\OAuth2\Server\Repository\MyDb\AccessTokenRepository;
+use Detain\OAuth2\Server\Repository\MyDb\ClientRepository;
+use Detain\OAuth2\Server\Repository\MyDb\ScopeRepository;
+use Detain\OAuth2\Server\Repository\MyDb\SessionsRepository;
+use Detain\OAuth2\Server\Repository\MyDb\AuthCodeRepository;
+use Detain\OAuth2\Server\Repository\MyDb\RefreshTokenRepository;
 
-$server->setAccessTokenStorage(new AccessTokenStorage($db));
-$server->setClientStorage(new ClientStorage($db));
-$server->setScopeStorage(new ScopeStorage($db));
-$server->setSessionStorage(new SessionStorage($db));
-$server->setAuthCodeStorage(new AuthCodeStorage($db));
-$server->setRefreshTokenStorage(new RefreshTokenStorageStorage($db));
+$server->setAccessTokenRepository(new AccessTokenRepository($db));
+$server->setClientRepository(new ClientRepository($db));
+$server->setScopeRepository(new ScopeRepository($db));
+$server->setSessionRepository(new SessionRepository($db));
+$server->setAuthCodeRepository(new AuthCodeRepository($db));
+$server->setRefreshTokenRepository(new RefreshTokenRepositoryRepository($db));
 ```
 
 ## Installation

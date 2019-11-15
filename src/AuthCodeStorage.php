@@ -1,14 +1,14 @@
 <?php
 
-namespace Detain\OAuth2\Server\Storage\MyDb;
+namespace Detain\OAuth2\Server\Repository\MyDb;
 
 
 use League\OAuth2\Server\Entity\AuthCodeEntity;
 use League\OAuth2\Server\Entity\ScopeEntity;
-use League\OAuth2\Server\Storage\AuthCodeInterface;
+use League\OAuth2\Server\Repository\AuthCodeInterface;
 use PDOException;
 
-class AuthCodeStorage extends Storage implements AuthCodeInterface
+class AuthCodeRepository extends Repository implements AuthCodeInterface
 {
 
 	/**

@@ -1,12 +1,12 @@
 <?php
 
-namespace Detain\OAuth2\Server\Storage\MyDb;
+namespace Detain\OAuth2\Server\Repository\MyDb;
 
 
 use League\OAuth2\Server\Entity\RefreshTokenEntity;
-use League\OAuth2\Server\Storage\RefreshTokenInterface;
+use League\OAuth2\Server\Repository\RefreshTokenInterface;
 
-class RefreshTokenStorage extends Storage implements RefreshTokenInterface
+class RefreshTokenRepository extends Repository implements RefreshTokenInterface
 {
 
 	/**

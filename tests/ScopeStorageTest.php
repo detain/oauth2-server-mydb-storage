@@ -1,5 +1,5 @@
 <?php
-use Detain\OAuth2\Server\Storage\MyDb\ScopeStorage;
+use Detain\OAuth2\Server\Repository\MyDb\ScopeRepository;
 use League\OAuth2\Server\AbstractServer;
 
 /**
@@ -8,10 +8,10 @@ use League\OAuth2\Server\AbstractServer;
  * Date: 16.03.16
  * Time: 23:00
  */
-class ScopeStorageTest extends MyDbTest
+class ScopeRepositoryTest extends MyDbTest
 {
 	/**
-	 * @var ScopeStorage
+	 * @var ScopeRepository
 	 */
 	protected $scope;
 	/**
@@ -41,7 +41,7 @@ class ScopeStorageTest extends MyDbTest
 	protected function setUp()
 	{
 		parent::setUp();
-		$this->scope = new ScopeStorage($this->db);
+		$this->scope = new ScopeRepository($this->db);
 		$this->server = $this->getMock(AbstractServer::class);
 
 		$this->scope->setServer($this->server);

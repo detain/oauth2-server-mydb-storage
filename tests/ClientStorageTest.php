@@ -1,5 +1,5 @@
 <?php
-use Detain\OAuth2\Server\Storage\MyDb\ClientStorage;
+use Detain\OAuth2\Server\Repository\MyDb\ClientRepository;
 use League\OAuth2\Server\AbstractServer;
 use League\OAuth2\Server\Entity\SessionEntity;
 
@@ -9,10 +9,10 @@ use League\OAuth2\Server\Entity\SessionEntity;
  * Date: 16.03.16
  * Time: 18:11
  */
-class ClientStorageTest extends MyDbTest
+class ClientRepositoryTest extends MyDbTest
 {
 	/**
-	 * @var ClientStorage
+	 * @var ClientRepository
 	 */
 	protected $client;
 	/**
@@ -86,7 +86,7 @@ class ClientStorageTest extends MyDbTest
 	protected function setUp()
 	{
 		parent::setUp();
-		$this->client = new ClientStorage($this->db);
+		$this->client = new ClientRepository($this->db);
 		$this->server = $this->getMock(AbstractServer::class);
 
 		$this->client->setServer($this->server);

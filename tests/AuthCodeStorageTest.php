@@ -1,5 +1,5 @@
 <?php
-use Detain\OAuth2\Server\Storage\MyDb\AuthCodeStorage;
+use Detain\OAuth2\Server\Repository\MyDb\AuthCodeRepository;
 use League\OAuth2\Server\AbstractServer;
 use League\OAuth2\Server\Entity\AuthCodeEntity;
 use League\OAuth2\Server\Entity\ScopeEntity;
@@ -10,10 +10,10 @@ use League\OAuth2\Server\Entity\ScopeEntity;
  * Date: 16.03.16
  * Time: 19:33
  */
-class AuthCodeStorageTest extends MyDbTest
+class AuthCodeRepositoryTest extends MyDbTest
 {
 	/**
-	 * @var AuthCodeStorage
+	 * @var AuthCodeRepository
 	 */
 	protected $authCode;
 	/**
@@ -145,7 +145,7 @@ class AuthCodeStorageTest extends MyDbTest
 	protected function setUp()
 	{
 		parent::setUp();
-		$this->authCode = new AuthCodeStorage($this->db);
+		$this->authCode = new AuthCodeRepository($this->db);
 		$this->server = $this->getMock(AbstractServer::class);
 
 		$this->authCode->setServer($this->server);

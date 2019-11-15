@@ -1,6 +1,6 @@
 <?php
-use Detain\OAuth2\Server\Storage\MyDb\AccessTokenStorage;
-use Detain\OAuth2\Server\Storage\MyDb\RefreshTokenStorage;
+use Detain\OAuth2\Server\Repository\MyDb\AccessTokenRepository;
+use Detain\OAuth2\Server\Repository\MyDb\RefreshTokenRepository;
 use League\OAuth2\Server\AbstractServer;
 use League\OAuth2\Server\Entity\AccessTokenEntity;
 use League\OAuth2\Server\Entity\RefreshTokenEntity;
@@ -11,10 +11,10 @@ use League\OAuth2\Server\Entity\RefreshTokenEntity;
  * Date: 16.03.16
  * Time: 21:05
  */
-class RefreshTokenStorageTest extends MyDbTest
+class RefreshTokenRepositoryTest extends MyDbTest
 {
 	/**
-	 * @var RefreshTokenStorage
+	 * @var RefreshTokenRepository
 	 */
 	protected $token;
 	/**
@@ -24,7 +24,7 @@ class RefreshTokenStorageTest extends MyDbTest
 	/**
 	 * @var PHPUnit_Framework_MockObject_MockObject
 	 */
-	protected $accessStorage;
+	protected $accessRepository;
 
 	public function testGetFailed()
 	{
@@ -38,7 +38,7 @@ class RefreshTokenStorageTest extends MyDbTest
 		$time = time() + 60 * 60;
 		$this->db->exec('INSERT INTO oauth_refresh_tokens VALUES ("10Refresh", ' . $time . ', "10Access");');
 		$accessToken = new AccessTokenEntity($this->server);
-		$this->accessStorage->expects($this->once())->method('get')->with('10Access')->willReturn($accessToken);
+		$this->accessRepository->expects($this->once())->method('get')->with('10Access')->willReturn($accessToken);
 
 		$authCode = $this->token->get('10Refresh');
 
@@ -105,10 +105,10 @@ class RefreshTokenStorageTest extends MyDbTest
 	protected function setUp()
 	{
 		parent::setUp();
-		$this->token = new RefreshTokenStorage($this->db);
+		$this->token = new RefreshTokenRepository($this->db);
 		$this->server = $this->getMock(AbstractServer::class);
-		$this->accessStorage = $this->getMockBuilder(AccessTokenStorage::class)->disableOriginalConstructor()->getMock();
-		$this->server->method('getAccessTokenStorage')->willReturn($this->accessStorage);
+		$this->accessRepository = $this->getMockBuilder(AccessTokenRepository::class)->disableOriginalConstructor()->getMock();
+		$this->server->method('getAccessTokenRepository')->willReturn($this->accessRepository);
 
 		$this->token->setServer($this->server);
 	}

@@ -1,15 +1,15 @@
 <?php
 
-namespace Detain\OAuth2\Server\Storage\MyDb;
+namespace Detain\OAuth2\Server\Repository\MyDb;
 
 
 use League\OAuth2\Server\Entity\AccessTokenEntity;
 use League\OAuth2\Server\Entity\AuthCodeEntity;
 use League\OAuth2\Server\Entity\ScopeEntity;
 use League\OAuth2\Server\Entity\SessionEntity;
-use League\OAuth2\Server\Storage\SessionInterface;
+use League\OAuth2\Server\Repository\SessionInterface;
 
-class SessionStorage extends Storage implements SessionInterface
+class SessionRepository extends Repository implements SessionInterface
 {
 	/**
 	 * Get a session from an access token
@@ -54,7 +54,7 @@ class SessionStorage extends Storage implements SessionInterface
 	/**
 	 * Create a new session
 	 *
-	 * @param string $ownerId SessionStorage owner's ID
+	 * @param string $ownerId SessionRepository owner's ID
 	 * @param string $clientId Client ID
 	 * @param string $clientRedirectUri Client redirect URI (default = null)
 	 *

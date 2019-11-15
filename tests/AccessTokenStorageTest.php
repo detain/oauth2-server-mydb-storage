@@ -1,5 +1,5 @@
 <?php
-use Detain\OAuth2\Server\Storage\MyDb\AccessTokenStorage;
+use Detain\OAuth2\Server\Repository\MyDb\AccessTokenRepository;
 use League\OAuth2\Server\AbstractServer;
 use League\OAuth2\Server\Entity\AccessTokenEntity;
 use League\OAuth2\Server\Entity\ScopeEntity;
@@ -10,10 +10,10 @@ use League\OAuth2\Server\Entity\ScopeEntity;
  * Date: 16.03.16
  * Time: 20:44
  */
-class AccessTokenStorageTest extends MyDbTest
+class AccessTokenRepositoryTest extends MyDbTest
 {
 	/**
-	 * @var AccessTokenStorage
+	 * @var AccessTokenRepository
 	 */
 	protected $accessToken;
 	/**
@@ -23,7 +23,7 @@ class AccessTokenStorageTest extends MyDbTest
 	/**
 	 * @var PHPUnit_Framework_MockObject_MockObject
 	 */
-	protected $accessStorage;
+	protected $accessRepository;
 
 	public function testGetFailed()
 	{
@@ -40,7 +40,7 @@ class AccessTokenStorageTest extends MyDbTest
 
 		$token = $this->accessToken->get('10authCode');
 
-		$this->accessStorage->expects($this->once())->method('getScopes')->with($token)->willReturn([''=>$scope]);
+		$this->accessRepository->expects($this->once())->method('getScopes')->with($token)->willReturn([''=>$scope]);
 		$this->assertNotNull($token);
 		$this->assertEquals('10authCode', $token->getId());
 		$this->assertEquals($time, $token->getExpireTime());
@@ -142,10 +142,10 @@ class AccessTokenStorageTest extends MyDbTest
 	protected function setUp()
 	{
 		parent::setUp();
-		$this->accessToken = new AccessTokenStorage($this->db);
+		$this->accessToken = new AccessTokenRepository($this->db);
 		$this->server = $this->getMock(AbstractServer::class);
-		$this->accessStorage = $this->getMockBuilder(AccessTokenStorage::class)->disableOriginalConstructor()->getMock();
-		$this->server->method('getAccessTokenStorage')->willReturn($this->accessStorage);
+		$this->accessRepository = $this->getMockBuilder(AccessTokenRepository::class)->disableOriginalConstructor()->getMock();
+		$this->server->method('getAccessTokenRepository')->willReturn($this->accessRepository);
 
 		$this->accessToken->setServer($this->server);
 	}

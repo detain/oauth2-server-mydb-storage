@@ -1,13 +1,13 @@
 <?php
 
-namespace Detain\OAuth2\Server\Storage\MyDb;
+namespace Detain\OAuth2\Server\Repository\MyDb;
 
 
 use League\OAuth2\Server\Entity\ClientEntity;
 use League\OAuth2\Server\Entity\SessionEntity;
-use League\OAuth2\Server\Storage\ClientInterface;
+use League\OAuth2\Server\Repository\ClientInterface;
 
-class ClientStorage extends Storage implements ClientInterface
+class ClientRepository extends Repository implements ClientInterface
 {
 
 	/**

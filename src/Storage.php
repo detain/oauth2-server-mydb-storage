@@ -1,13 +1,13 @@
 <?php
 
-namespace Detain\OAuth2\Server\Storage\MyDb;
+namespace Detain\OAuth2\Server\Repository\MyDb;
 
 
-use League\OAuth2\Server\Storage\AbstractStorage;
+use League\OAuth2\Server\Repository\AbstractRepository;
 use MyDb\Generic;
 use PDOException;
 
-class Storage extends AbstractStorage
+class Repository extends AbstractRepository
 {
 	/**
 	 * @var MyDb\Generic
@@ -20,7 +20,7 @@ class Storage extends AbstractStorage
 
 
 	/**
-	 * Storage constructor.
+	 * Repository constructor.
 	 * @param MyDb\Generic $db
 	 */
 	public function __construct(MyDb\Generic $db)

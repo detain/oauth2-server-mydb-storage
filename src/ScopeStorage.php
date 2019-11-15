@@ -1,12 +1,12 @@
 <?php
 
-namespace Detain\OAuth2\Server\Storage\MyDb;
+namespace Detain\OAuth2\Server\Repository\MyDb;
 
 
 use League\OAuth2\Server\Entity\ScopeEntity;
-use League\OAuth2\Server\Storage\ScopeInterface;
+use League\OAuth2\Server\Repository\ScopeInterface;
 
-class ScopeStorage extends Storage implements ScopeInterface
+class ScopeRepository extends Repository implements ScopeInterface
 {
 
 	/**

@@ -9,7 +9,7 @@
     }
   ],
   "autoload": {
-    "psr-4": {"Detain\\OAuth2\\Server\\Storage\\MyDb\\" : "src"}
+    "psr-4": {"Detain\\OAuth2\\Server\\Repository\\MyDb\\" : "src"}
   },
   "require": {
     "league/oauth2-server": ">=4.0",
