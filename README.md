@@ -50,3 +50,48 @@ In your project root just run:
 ```bash
 $ composer require detain/oauth2-server-mydb-storage
 ```
+
+## Testing the client credentials grant example
+
+Send the following cURL request:
+
+```
+curl -X "POST" "https://mynew.interserver.net/oauth/server/client_credentials.php/access_token" \
+	-H "Content-Type: application/x-www-form-urlencoded" \
+	-H "Accept: 1.0" \
+	--data-urlencode "grant_type=client_credentials" \
+	--data-urlencode "client_id=myawesomeapp" \
+	--data-urlencode "client_secret=abc123" \
+	--data-urlencode "scope=basic email"
+```
+
+## Testing the password grant example
+
+Send the following cURL request:
+
+```
+curl -X "POST" "https://mynew.interserver.net/oauth/server/password.php/access_token" \
+	-H "Content-Type: application/x-www-form-urlencoded" \
+	-H "Accept: 1.0" \
+	--data-urlencode "grant_type=password" \
+	--data-urlencode "client_id=myawesomeapp" \
+	--data-urlencode "client_secret=abc123" \
+	--data-urlencode "username=alex" \
+	--data-urlencode "password=whisky" \
+	--data-urlencode "scope=basic email"
+```
+
+## Testing the refresh token grant example
+
+Send the following cURL request. Replace `{{REFRESH_TOKEN}}` with a refresh token from another grant above:
+
+```
+curl -X "POST" "https://mynew.interserver.net/oauth/server/refresh_token.php/access_token" \
+	-H "Content-Type: application/x-www-form-urlencoded" \
+	-H "Accept: 1.0" \
+	--data-urlencode "grant_type=refresh_token" \
+	--data-urlencode "client_id=myawesomeapp" \
+	--data-urlencode "client_secret=abc123" \
+	--data-urlencode "refresh_token={{REFRESH_TOKEN}}"
+```
+
