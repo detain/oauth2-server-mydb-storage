@@ -1,5 +1,5 @@
 <?php
-use Detain\OAuth2\Server\Storage\PDO\AccessTokenStorage;
+use Detain\OAuth2\Server\Storage\MyDb\AccessTokenStorage;
 use League\OAuth2\Server\AbstractServer;
 use League\OAuth2\Server\Entity\AccessTokenEntity;
 use League\OAuth2\Server\Entity\ScopeEntity;

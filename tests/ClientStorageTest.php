@@ -1,5 +1,5 @@
 <?php
-use Detain\OAuth2\Server\Storage\PDO\ClientStorage;
+use Detain\OAuth2\Server\Storage\MyDb\ClientStorage;
 use League\OAuth2\Server\AbstractServer;
 use League\OAuth2\Server\Entity\SessionEntity;
 

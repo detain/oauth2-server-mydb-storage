@@ -1,5 +1,5 @@
 <?php
-use Detain\OAuth2\Server\Storage\PDO\ScopeStorage;
+use Detain\OAuth2\Server\Storage\MyDb\ScopeStorage;
 use League\OAuth2\Server\AbstractServer;
 
 /**

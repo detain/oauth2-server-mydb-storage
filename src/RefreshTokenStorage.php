@@ -6,7 +6,7 @@
  * Time: 21:04
  */
 
-namespace Detain\OAuth2\Server\Storage\PDO;
+namespace Detain\OAuth2\Server\Storage\MyDb;
 
 
 use League\OAuth2\Server\Entity\RefreshTokenEntity;

@@ -1,6 +1,6 @@
 <?php
-use Detain\OAuth2\Server\Storage\PDO\ClientStorage;
-use Detain\OAuth2\Server\Storage\PDO\SessionStorage;
+use Detain\OAuth2\Server\Storage\MyDb\ClientStorage;
+use Detain\OAuth2\Server\Storage\MyDb\SessionStorage;
 use League\Event\Emitter;
 use League\OAuth2\Server\AbstractServer;
 use League\OAuth2\Server\Entity\AccessTokenEntity;
