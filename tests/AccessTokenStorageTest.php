@@ -10,7 +10,7 @@ use League\OAuth2\Server\Entity\ScopeEntity;
  * Date: 16.03.16
  * Time: 20:44
  */
-class AccessTokenStorageTest extends PDOTest
+class AccessTokenStorageTest extends MyDbTest
 {
 	/**
 	 * @var AccessTokenStorage

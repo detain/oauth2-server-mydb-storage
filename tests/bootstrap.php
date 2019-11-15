@@ -1,17 +1,11 @@
 <?php
-/**
- * Created by IntelliJ IDEA.
- * User: david
- * Date: 16.03.16
- * Time: 10:44
- */
 require __DIR__ . '/../vendor/autoload.php';
 
-class PDOTest extends PHPUnit_Framework_TestCase
+class MyDbTest extends PHPUnit_Framework_TestCase
 {
 	private static $sql;
 	/**
-	 * @var PDO
+	 * @var MyAdb\Generic
 	 */
 	protected $db;
 
@@ -24,7 +18,7 @@ class PDOTest extends PHPUnit_Framework_TestCase
 	protected function setUp()
 	{
 		parent::setUp();
-		$this->db = new PDO('sqlite::memory:', '', '');
+		$this->db = new MyDb\Generic('sqlite::memory:', '', '');
 		$this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		$this->setupTable();
 	}
@@ -35,7 +29,7 @@ class PDOTest extends PHPUnit_Framework_TestCase
 	}
 }
 
-class ServerTest extends PDOTest{
+class ServerTest extends MyDbTest{
 	protected function setUp()
 	{
 		parent::setUp();

@@ -8,7 +8,7 @@ use League\OAuth2\Server\AbstractServer;
  * Date: 16.03.16
  * Time: 23:00
  */
-class ScopeStorageTest extends PDOTest
+class ScopeStorageTest extends MyDbTest
 {
 	/**
 	 * @var ScopeStorage

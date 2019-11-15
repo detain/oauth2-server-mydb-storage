@@ -10,15 +10,15 @@ namespace Detain\OAuth2\Server\Storage\MyDb;
 
 
 use League\OAuth2\Server\Storage\AbstractStorage;
-use PDO;
+use MyDb\Generic;
 use PDOException;
 
 class Storage extends AbstractStorage
 {
 	/**
-	 * @var PDO
+	 * @var MyDb\Generic
 	 */
-	protected $pdo;
+	protected $db;
 	/**
 	 * @var bool
 	 */
@@ -27,35 +27,35 @@ class Storage extends AbstractStorage
 
 	/**
 	 * Storage constructor.
-	 * @param PDO $pdo
+	 * @param MyDb\Generic $db
 	 */
-	public function __construct(PDO $pdo)
+	public function __construct(MyDb\Generic $db)
 	{
-		$this->pdo = $pdo;
-		$this->supportsReturning = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql';
+		$this->db = $db;
+		$this->supportsReturning = $db->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql';
 	}
 
 	/**
-	 * prepare and execute sql statement on the pdo. Run PDO::fetchAll on select, describe or pragma statements
+	 * prepare and execute sql statement on the pdo. Run MyDb\Generic::fetchAll on select, describe or pragma statements
 	 *
 	 * @param string $sql This must be a valid SQL statement for the target database server.
 	 * @param array $bind [optional]
 	 *                     An array of values with as many elements as there are bound parameters in the SQL statement
 	 *                     being executed
-	 * @param bool $shouldThrow if throw PDOException if prepare or execute failed otherwise return false (default true )
+	 * @param bool $shouldThrow if throw MyDb\GenericException if prepare or execute failed otherwise return false (default true )
 	 * @param bool $returnStatement if true always return \PDOStatement
 	 * @return array|false|int|\PDOStatement <ul>
 	 *                     <li> associative array of results if sql statement is select, describe or pragma
 	 *                     <li> the number of rows affected by a delete, insert, update or replace statement
 	 *                     <li> the executed PDOStatement otherwise</ul>
 	 *                     <li> false only if execution failed and the PDO::ERRMODE_EXCEPTION was unset</ul>
-	 * @see PDO::execute
-	 * @see PDO::prepare
+	 * @see MyDb\Generic::execute
+	 * @see MyDb\Generic::prepare
 	 */
 	public function run($sql, $bind = array(), $shouldThrow = true, $returnStatement = false)
 	{
 		$sql = trim($sql);
-		$statement = $this->pdo->prepare($sql);
+		$statement = $this->db->prepare($sql);
 		if ($statement !== false and ($statement->execute($bind) !== false)) {
 			if ($returnStatement) {
 				return $statement;
@@ -68,7 +68,7 @@ class Storage extends AbstractStorage
 			}
 		}
 		if ($shouldThrow) {
-			throw new PDOException($this->pdo->errorCode() . ' ' . ($statement === false ? 'prepare' : 'execute') . ' failed');
+			throw new PDOException($this->db->errorCode() . ' ' . ($statement === false ? 'prepare' : 'execute') . ' failed');
 		}
 		return false;
 	}

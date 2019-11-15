@@ -11,7 +11,7 @@ use League\OAuth2\Server\Entity\RefreshTokenEntity;
  * Date: 16.03.16
  * Time: 21:05
  */
-class RefreshTokenStorageTest extends PDOTest
+class RefreshTokenStorageTest extends MyDbTest
 {
 	/**
 	 * @var RefreshTokenStorage

@@ -9,7 +9,7 @@ use League\OAuth2\Server\Entity\SessionEntity;
  * Date: 16.03.16
  * Time: 18:11
  */
-class ClientStorageTest extends PDOTest
+class ClientStorageTest extends MyDbTest
 {
 	/**
 	 * @var ClientStorage

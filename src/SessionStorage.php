@@ -81,7 +81,7 @@ class SessionStorage extends Storage implements SessionInterface
 		} else {
 			$this->run('INSERT INTO oauth_sessions (owner_type, owner_id, client_id, client_redirect_uri)
 							VALUES (?,?,?,?)', [$ownerType, $ownerId, $clientId, $clientRedirectUri]);
-			return $this->pdo->lastInsertId();
+			return $this->db->lastInsertId();
 		}
 	}
 

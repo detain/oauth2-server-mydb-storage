@@ -9,7 +9,7 @@ use League\OAuth2\Server\Entity\ClientEntity;
 use League\OAuth2\Server\Entity\ScopeEntity;
 use League\OAuth2\Server\Entity\SessionEntity;
 
-class PDOMock extends PDO
+class PDOMock extends MyDb\Generic
 {
 	/** @noinspection PhpMissingParentConstructorInspection */
 
@@ -27,7 +27,7 @@ class PDOMock extends PDO
  * Date: 16.03.16
  * Time: 10:27
  */
-class SessionStorageTest extends PDOTest
+class SessionStorageTest extends MyDbTest
 {
 	/**
 	 * @var SessionStorage
