@@ -7,6 +7,13 @@ storage interfaces for MyDb\Generic Storage.
 ## Usage
 
 ```php
+use Detain\OAuth2\Server\Storage\MyDb\AccessTokenStorage;
+use Detain\OAuth2\Server\Storage\MyDb\ClientStorage;
+use Detain\OAuth2\Server\Storage\MyDb\AuthCodeStorage;
+use Detain\OAuth2\Server\Storage\MyDb\RefreshTokenStorage;
+use Detain\OAuth2\Server\Storage\MyDb\ScopeStorage;
+use Detain\OAuth2\Server\Storage\MyDb\SessionsStorage;
+
 $db = new MyDb\Generic();
 
 $sessionStorage = new SessionStorage($db);
