@@ -20,7 +20,7 @@ class ScopeStorage extends Storage implements ScopeInterface
 	 */
 	public function get($scope, $grantType = null, $clientId = null)
 	{
-		$this->db->query('SELECT * FROM oauth_scopes WHERE id = ?', [$scope]);
+		$this->db->query('SELECT * FROM oauth_scopes WHERE id = "'.$this->db->real_escape($scope).'"');
 		if ($this->db->num_rows() === 1) {
 			$this->db->next_record(MYSQL_ASSOC);
 			$scope = new ScopeEntity($this->server);

@@ -63,7 +63,7 @@ class SessionStorage extends Storage implements SessionInterface
 	public function create($ownerId, $clientId, $clientRedirectUri = null)
 	{
 		if ($this->supportsReturning) {
-			$stmt = $this->run(/** @lang PostgreSQL */
+			$stmt = $this->db->query(/** @lang PostgreSQL */
 				'INSERT INTO oauth_sessions (owner_type, owner_id, client_id, client_redirect_uri) VALUES (?,?,?,?) RETURNING id', [$ownerId, $clientId, $clientRedirectUri], true, true);
 			return $stmt->fetchColumn();
 		} else {

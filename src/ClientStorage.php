@@ -24,22 +24,15 @@ class ClientStorage extends Storage implements ClientInterface
 	{
 		$sql = 'SELECT clients.* FROM oauth_clients as clients ';
 		$where = [];
-		$where[] = 'WHERE clients.id = :clientId';
-		$binds = [];
-		$binds[':clientId'] = $clientId;
-
+		$where[] = 'WHERE clients.id = "'.$this->db->real_escape($clientId).'" ';
 		if ($clientSecret != null) {
-			$where[] = ' clients.secret = :clientSecret ';
-			$binds[':clientSecret'] = $clientSecret;
+			$where[] = ' clients.secret = "'.$this->db->real_escape($clientSecret).'" ';
 		}
 		if ($redirectUri != null) {
 			$sql .= ' LEFT JOIN oauth_client_redirect_uris as redirect ON (redirect.client_id = clients.id) ';
-			$where[] = ' redirect.redirect_uri = :redirectUri ';
-			$binds[':redirectUri'] = $redirectUri;
+			$where[] = ' redirect.redirect_uri = "'.$this->db->real_escape($redirectUri).'" ';
 		}
-
-		$this->db->query($sql . implode(' AND ', $where), $binds);
-
+		$this->db->query($sql . implode(' AND ', $where));
 		if ($this->db->num_rows() === 1) {
 			$this->db->next_record(MYSQL_ASSOC);
 			$client = new ClientEntity($this->getServer());
@@ -59,9 +52,7 @@ class ClientStorage extends Storage implements ClientInterface
 	 */
 	public function getBySession(SessionEntity $session)
 	{
-		$this->db->query('SELECT client.id, client.name FROM oauth_clients as client
-							LEFT JOIN oauth_sessions as sess  ON(sess.client_id = client.id)
-							WHERE sess.id = ?', [$session->getId()]);
+		$this->db->query('SELECT client.id, client.name FROM oauth_clients as client LEFT JOIN oauth_sessions as sess  ON(sess.client_id = client.id) WHERE sess.id = "'.$this->db->real_escape($session->getId()).'"');
 		if ($this->db->num_rows() === 1) {
 			$this->db->next_record(MYSQL_ASSOC);
 			$client = new ClientEntity($this->getServer());

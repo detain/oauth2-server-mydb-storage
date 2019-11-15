@@ -18,7 +18,7 @@ class RefreshTokenStorage extends Storage implements RefreshTokenInterface
 	 */
 	public function get($token)
 	{
-		$this->db->query('SELECT * FROM oauth_refresh_tokens WHERE refresh_token = ?', [$token]);
+		$this->db->query('SELECT * FROM oauth_refresh_tokens WHERE refresh_token = "'.$this->db->real_escape($token).'"');
 		if ($this->db->num_rows() === 1) {
 			$this->db->next_record(MYSQL_ASSOC);
 			$token = new RefreshTokenEntity($this->server);
@@ -41,8 +41,7 @@ class RefreshTokenStorage extends Storage implements RefreshTokenInterface
 	 */
 	public function create($token, $expireTime, $accessToken)
 	{
-		$this->run('INSERT INTO oauth_refresh_tokens (refresh_token, expire_time, access_token)
-							VALUES (?,?,?)', [$token, $expireTime, $accessToken]);
+		$this->db->query('INSERT INTO oauth_refresh_tokens (refresh_token, expire_time, access_token) VALUES ("'.$this->db->real_escape($token).'","'.$this->db->real_escape($expireTime).'","'.$this->db->real_escape($accessToken).'")');
 		$token = new RefreshTokenEntity($this->server);
 		$token->setId($token);
 		$token->setExpireTime($expireTime);
@@ -59,6 +58,6 @@ class RefreshTokenStorage extends Storage implements RefreshTokenInterface
 	 */
 	public function delete(RefreshTokenEntity $token)
 	{
-		$this->run('DELETE FROM oauth_refresh_tokens WHERE refresh_token = ?', [$token->getId()]);
+		$this->db->query('DELETE FROM oauth_refresh_tokens WHERE refresh_token = "'.$this->db->real_escape($token->getId()).'"');
 	}
 }
