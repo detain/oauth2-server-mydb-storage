@@ -63,8 +63,8 @@ curl -X "POST" "https://mynew.interserver.net/oauth/server/client_credentials.ph
 	-H "Content-Type: application/x-www-form-urlencoded" \
 	-H "Accept: 1.0" \
 	--data-urlencode "grant_type=client_credentials" \
-	--data-urlencode "client_id=myawesomeapp" \
-	--data-urlencode "client_secret=abc123" \
+	--data-urlencode "client_id=rocketchat_2773" \
+	--data-urlencode "client_secret=s3cr3t" \
 	--data-urlencode "scope=basic email"
 ```
 
@@ -77,8 +77,8 @@ curl -X "POST" "https://mynew.interserver.net/oauth/server/password.php/access_t
 	-H "Content-Type: application/x-www-form-urlencoded" \
 	-H "Accept: 1.0" \
 	--data-urlencode "grant_type=password" \
-	--data-urlencode "client_id=myawesomeapp" \
-	--data-urlencode "client_secret=abc123" \
+	--data-urlencode "client_id=rocketchat_2773" \
+	--data-urlencode "client_secret=s3cr3t" \
 	--data-urlencode "username=alex" \
 	--data-urlencode "password=whisky" \
 	--data-urlencode "scope=basic email"
@@ -93,8 +93,8 @@ curl -X "POST" "https://mynew.interserver.net/oauth/server/refresh_token.php/acc
 	-H "Content-Type: application/x-www-form-urlencoded" \
 	-H "Accept: 1.0" \
 	--data-urlencode "grant_type=refresh_token" \
-	--data-urlencode "client_id=myawesomeapp" \
-	--data-urlencode "client_secret=abc123" \
+	--data-urlencode "client_id=rocketchat_2773" \
+	--data-urlencode "client_secret=s3cr3t" \
 	--data-urlencode "refresh_token={{REFRESH_TOKEN}}"
 ```
 
