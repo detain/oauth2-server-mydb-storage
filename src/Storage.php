@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by IntelliJ IDEA.
- * User: david
- * Date: 16.03.16
- * Time: 10:09
- */
 
 namespace Detain\OAuth2\Server\Storage\MyDb;
 

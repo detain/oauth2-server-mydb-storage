@@ -7,7 +7,7 @@ storage interfaces for MyDb\Generic Storage.
 ## Usage
 
 ```php
-$db = new MyDb\Generic('sqlite:oauth2.db');
+$db = new MyDb\Generic();
 
 $sessionStorage = new SessionStorage($db);
 $accessTokenStorage = new AccessTokenStorage($db);
@@ -22,6 +22,18 @@ $server = new ResourceServer(
 );
 //…
 ```
+
+Once you have an instance of `League\OAuth2\Server\AuthorizationServer` you can set the different storages.
+
+```php
+$server->setClientStorage(new Detain\OAuth2\Server\Storage\MyDb\ClientStorage($db));
+$server->setSessionStorage(new Detain\OAuth2\Server\Storage\MyDb\SessionStorage($db));
+$server->setAccessTokenStorage(new Detain\OAuth2\Server\Storage\MyDb\AccessTokenStorage($db));
+$server->setRefreshTokenStorage(new Detain\OAuth2\Server\Storage\MyDb\RefreshTokenStorageStorage($db));
+$server->setAuthCodeStorage(new Detain\OAuth2\Server\Storage\MyDb\AuthCodeStorage($db));
+$server->setScopeStorage(new Detain\OAuth2\Server\Storage\MyDb\ScopeStorage($db));
+```
+
 ## Installation
 
 The recommended installation method is via [Composer](https://getcomposer.org/).

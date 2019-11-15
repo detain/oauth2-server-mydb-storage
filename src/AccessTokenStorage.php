@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by IntelliJ IDEA.
- * User: david
- * Date: 16.03.16
- * Time: 20:43
- */
 
 namespace Detain\OAuth2\Server\Storage\MyDb;
 
@@ -27,10 +21,11 @@ class AccessTokenStorage extends Storage implements AccessTokenInterface
 	public function get($token)
 	{
 		$result = $this->run('SELECT * FROM oauth_access_tokens WHERE access_token = ?',[$token]);
-		if (count($result) === 1) {
+		if ($this->db->num_rows() === 1) {
+			$this->db->next_record(MYSQL_ASSOC);
 			$token = new AccessTokenEntity($this->server);
-			$token->setId($result[0]['access_token']);
-			$token->setExpireTime($result[0]['expire_time']);
+			$token->setId($this->db->Record['access_token']);
+			$token->setExpireTime($this->db->Record['expire_time']);
 			return $token;
 		}
 		return null;

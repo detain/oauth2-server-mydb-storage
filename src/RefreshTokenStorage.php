@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by IntelliJ IDEA.
- * User: david
- * Date: 16.03.16
- * Time: 21:04
- */
 
 namespace Detain\OAuth2\Server\Storage\MyDb;
 
@@ -25,11 +19,12 @@ class RefreshTokenStorage extends Storage implements RefreshTokenInterface
 	public function get($token)
 	{
 		$result = $this->run('SELECT * FROM oauth_refresh_tokens WHERE refresh_token = ?', [$token]);
-		if (count($result) === 1) {
+		if ($this->db->num_rows() === 1) {
+			$this->db->next_record(MYSQL_ASSOC);
 			$token = new RefreshTokenEntity($this->server);
-			$token->setId($result[0]['refresh_token']);
-			$token->setExpireTime($result[0]['expire_time']);
-			$token->setAccessTokenId($result[0]['access_token']);
+			$token->setId($this->db->Record['refresh_token']);
+			$token->setExpireTime($this->db->Record['expire_time']);
+			$token->setAccessTokenId($this->db->Record['access_token']);
 			return $token;
 		}
 		return null;

@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by IntelliJ IDEA.
- * User: david
- * Date: 16.03.16
- * Time: 22:57
- */
 
 namespace Detain\OAuth2\Server\Storage\MyDb;
 
@@ -27,9 +21,10 @@ class ScopeStorage extends Storage implements ScopeInterface
 	public function get($scope, $grantType = null, $clientId = null)
 	{
 		$result = $this->run('SELECT * FROM oauth_scopes WHERE id = ?', [$scope]);
-		if (count($result) === 1) {
+		if ($this->db->num_rows() === 1) {
+			$this->db->next_record(MYSQL_ASSOC);
 			$scope = new ScopeEntity($this->server);
-			$scope->hydrate($result[0]);
+			$scope->hydrate($this->db->Record);
 			return $scope;
 		}
 		return null;

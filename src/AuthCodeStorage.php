@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by IntelliJ IDEA.
- * User: david
- * Date: 16.03.16
- * Time: 19:32
- */
 
 namespace Detain\OAuth2\Server\Storage\MyDb;
 
@@ -28,11 +22,12 @@ class AuthCodeStorage extends Storage implements AuthCodeInterface
 	public function get($code)
 	{
 		$result = $this->run('SELECT * FROM oauth_auth_codes WHERE auth_code = ?', [$code]);
-		if (count($result) === 1) {
+		if ($this->db->num_rows() === 1) {
+			$this->db->next_record(MYSQL_ASSOC);
 			$token = new AuthCodeEntity($this->server);
-			$token->setId($result[0]['auth_code']);
-			$token->setRedirectUri($result[0]['client_redirect_uri']);
-			$token->setExpireTime($result[0]['expire_time']);
+			$token->setId($this->db->Record['auth_code']);
+			$token->setRedirectUri($this->db->Record['client_redirect_uri']);
+			$token->setExpireTime($this->db->Record['expire_time']);
 			return $token;
 		}
 		return null;

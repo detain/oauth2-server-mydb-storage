@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by IntelliJ IDEA.
- * User: david
- * Date: 16.03.16
- * Time: 17:58
- */
 
 namespace Detain\OAuth2\Server\Storage\MyDb;
 
@@ -46,9 +40,10 @@ class ClientStorage extends Storage implements ClientInterface
 
 		$result = $this->run($sql . implode(' AND ', $where), $binds);
 
-		if (count($result) === 1) {
+		if ($this->db->num_rows() === 1) {
+			$this->db->next_record(MYSQL_ASSOC);
 			$client = new ClientEntity($this->getServer());
-			$client->hydrate($result[0]);
+			$client->hydrate($this->db->Record);
 			return $client;
 		}
 
@@ -67,11 +62,12 @@ class ClientStorage extends Storage implements ClientInterface
 		$result = $this->run('SELECT client.id, client.name FROM oauth_clients as client
 							LEFT JOIN oauth_sessions as sess  ON(sess.client_id = client.id)
 							WHERE sess.id = ?', [$session->getId()]);
-		if (count($result) === 1) {
+		if ($this->db->num_rows() === 1) {
+			$this->db->next_record(MYSQL_ASSOC);
 			$client = new ClientEntity($this->getServer());
 			$client->hydrate([
-					'id' => $result[0]['id'],
-					'name' => $result[0]['name']
+					'id' => $this->db->Record['id'],
+					'name' => $this->db->Record['name']
 			]);
 			return $client;
 		}
