@@ -20,7 +20,7 @@ class AccessTokenStorage extends Storage implements AccessTokenInterface
 	 */
 	public function get($token)
 	{
-		$result = $this->run('SELECT * FROM oauth_access_tokens WHERE access_token = ?',[$token]);
+		$this->db->query('SELECT * FROM oauth_access_tokens WHERE access_token = ?',[$token]);
 		if ($this->db->num_rows() === 1) {
 			$this->db->next_record(MYSQL_ASSOC);
 			$token = new AccessTokenEntity($this->server);

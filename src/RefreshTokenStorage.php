@@ -18,7 +18,7 @@ class RefreshTokenStorage extends Storage implements RefreshTokenInterface
 	 */
 	public function get($token)
 	{
-		$result = $this->run('SELECT * FROM oauth_refresh_tokens WHERE refresh_token = ?', [$token]);
+		$this->db->query('SELECT * FROM oauth_refresh_tokens WHERE refresh_token = ?', [$token]);
 		if ($this->db->num_rows() === 1) {
 			$this->db->next_record(MYSQL_ASSOC);
 			$token = new RefreshTokenEntity($this->server);

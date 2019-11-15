@@ -40,7 +40,7 @@ class SessionStorage extends Storage implements SessionInterface
 	 */
 	public function getByAuthCode(AuthCodeEntity $authCode)
 	{
-		$result = $this->run('SELECT id, owner_type, owner_id FROM oauth_sessions as s JOIN oauth_auth_codes as codes ON(codes.session_id = id) WHERE codes.auth_code = "'.$this->db->real_escape($authCode->getId()).'"');
+		$this->db->query('SELECT id, owner_type, owner_id FROM oauth_sessions as s JOIN oauth_auth_codes as codes ON(codes.session_id = id) WHERE codes.auth_code = "'.$this->db->real_escape($authCode->getId()).'"');
 		if ($this->db->num_rows() === 1) {
 			$this->db->next_record(MYSQL_ASSOC);
 			$session = new SessionEntity($this->getServer());
@@ -54,21 +54,20 @@ class SessionStorage extends Storage implements SessionInterface
 	/**
 	 * Create a new session
 	 *
-	 * @param string $ownerType SessionStorage owner's type (user, client)
 	 * @param string $ownerId SessionStorage owner's ID
 	 * @param string $clientId Client ID
 	 * @param string $clientRedirectUri Client redirect URI (default = null)
 	 *
 	 * @return integer The session's ID
 	 */
-	public function create($ownerType, $ownerId, $clientId, $clientRedirectUri = null)
+	public function create($ownerId, $clientId, $clientRedirectUri = null)
 	{
 		if ($this->supportsReturning) {
 			$stmt = $this->run(/** @lang PostgreSQL */
-				'INSERT INTO oauth_sessions (owner_type, owner_id, client_id, client_redirect_uri) VALUES (?,?,?,?) RETURNING id', [$ownerType, $ownerId, $clientId, $clientRedirectUri], true, true);
+				'INSERT INTO oauth_sessions (owner_type, owner_id, client_id, client_redirect_uri) VALUES (?,?,?,?) RETURNING id', [$ownerId, $clientId, $clientRedirectUri], true, true);
 			return $stmt->fetchColumn();
 		} else {
-			$this->run('INSERT INTO oauth_sessions (owner_type, owner_id, client_id, client_redirect_uri) VALUES (?,?,?,?)', [$ownerType, $ownerId, $clientId, $clientRedirectUri]);
+			$this->db->query('INSERT INTO oauth_sessions (owner_id, client_id, client_redirect_uri) VALUES ("'.$this->db->real_esacape($ownerId).'","'.$this->db->real_esacape($clientId).'","'.$this->db->real_esacape($clientRedirectUri).'")');
 			return $this->db->lastInsertId();
 		}
 	}
@@ -82,12 +81,12 @@ class SessionStorage extends Storage implements SessionInterface
 	 */
 	public function getScopes(SessionEntity $session)
 	{
-		$results = $this->run('SELECT scope.* FROM oauth_sessions as sess JOIN oauth_session_scopes as ss ON(ss.session_id=sess.id) JOIN oauth_scopes as scope ON(scope.id=ss.scope) WHERE sess.id = "'.$this->db->real_escape($session->getId()).'"');
+		$this->db->query('SELECT scope.* FROM oauth_sessions as sess JOIN oauth_session_scopes as ss ON(ss.session_id=sess.id) JOIN oauth_scopes as scope ON(scope.id=ss.scope) WHERE sess.id = "'.$this->db->real_escape($session->getId()).'"');
 		$scopes = [];
-		foreach ($results as $scope) {
+		while($this->db->next_record(MYSQL_ASSOC)) {
 			$scopes[] = (new ScopeEntity($this->server))->hydrate([
-				'id' => $scope['id'],
-				'description' => $scope['description'],
+				'id' => $this->db->Record['id'],
+				'description' => $this->db->Record['description'],
 			]);
 		}
 		return $scopes;
@@ -103,6 +102,6 @@ class SessionStorage extends Storage implements SessionInterface
 	 */
 	public function associateScope(SessionEntity $session, ScopeEntity $scope)
 	{
-		$this->run('INSERT INTO oauth_session_scopes (session_id, scope) VALUES (?,?)', [$session->getId(), $scope->getId()]);
+		$this->db->query('INSERT INTO oauth_session_scopes (session_id, scope) VALUES ("'.$this->db->real_esacape($session->getId()).'","'.$this->db->real_esacape($scope->getId()).'")');
 	}
 }

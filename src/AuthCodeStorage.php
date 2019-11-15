@@ -21,7 +21,7 @@ class AuthCodeStorage extends Storage implements AuthCodeInterface
 	 */
 	public function get($code)
 	{
-		$result = $this->run('SELECT * FROM oauth_auth_codes WHERE auth_code = ?', [$code]);
+		$this->db->query('SELECT * FROM oauth_auth_codes WHERE auth_code = ?', [$code]);
 		if ($this->db->num_rows() === 1) {
 			$this->db->next_record(MYSQL_ASSOC);
 			$token = new AuthCodeEntity($this->server);

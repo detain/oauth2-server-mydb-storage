@@ -38,7 +38,7 @@ class ClientStorage extends Storage implements ClientInterface
 			$binds[':redirectUri'] = $redirectUri;
 		}
 
-		$result = $this->run($sql . implode(' AND ', $where), $binds);
+		$this->db->query($sql . implode(' AND ', $where), $binds);
 
 		if ($this->db->num_rows() === 1) {
 			$this->db->next_record(MYSQL_ASSOC);
@@ -59,7 +59,7 @@ class ClientStorage extends Storage implements ClientInterface
 	 */
 	public function getBySession(SessionEntity $session)
 	{
-		$result = $this->run('SELECT client.id, client.name FROM oauth_clients as client
+		$this->db->query('SELECT client.id, client.name FROM oauth_clients as client
 							LEFT JOIN oauth_sessions as sess  ON(sess.client_id = client.id)
 							WHERE sess.id = ?', [$session->getId()]);
 		if ($this->db->num_rows() === 1) {
