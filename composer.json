@@ -12,10 +12,10 @@
     "psr-4": {"Detain\\OAuth2\\Server\\Repository\\MyDb\\" : "src"}
   },
   "require": {
-    "league/oauth2-server": ">=4.0",
+    "league/oauth2-server": ">=6.1.1,<8.3.2",
     "ext-pdo": "*"
   },
   "require-dev": {
-    "phpunit/phpunit": ">=4.0"
+    "phpunit/phpunit": ">=6.0"
   }
 }
