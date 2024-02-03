@@ -45,7 +45,7 @@ class Repository extends AbstractRepository
      * @see MyDb\Generic::execute
      * @see MyDb\Generic::prepare
      */
-    public function run($sql, $bind = array(), $shouldThrow = true, $returnStatement = false)
+    public function run($sql, $bind = [], $shouldThrow = true, $returnStatement = false)
     {
         $sql = trim($sql);
         $statement = $this->db->prepare($sql);
