@@ -8,6 +8,10 @@
 ## composer
 vendor/
 composer.phar
+composer.lock
+
+# PHPUnit cache
+.phpunit.result.cache
 
 # Caliber local state
 .caliber/

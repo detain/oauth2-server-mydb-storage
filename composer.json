@@ -1,21 +1,35 @@
 {
-  "name": "detain/oauth2-server-mydb-storage",
-  "description": "Implementation of thephpleague oauth2 server storage interfaces for MyDb storage",
-  "minimum-stability": "stable",
-  "license": "MIT",
-  "authors": [
-    {
-      "name": "Joe Huss"
+    "name": "detain/oauth2-server-mydb-storage",
+    "description": "MyDb storage adapter implementing the thephpleague/oauth2-server (4.x) storage interfaces.",
+    "type": "library",
+    "keywords": ["oauth2", "oauth", "auth", "league", "storage", "mydb", "mysql", "interserver"],
+    "homepage": "https://github.com/detain/oauth2-server-mydb-storage",
+    "minimum-stability": "stable",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Joe Huss",
+            "email": "detain@interserver.net"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Detain\\OAuth2\\Server\\Repository\\MyDb\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "classmap": ["tests/bootstrap.php"]
+    },
+    "require": {
+        "php": ">=7.0",
+        "ext-pdo": "*",
+        "league/oauth2-server": "^4.1",
+        "detain/db_abstraction": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.0"
+    },
+    "scripts": {
+        "test": "phpunit"
     }
-  ],
-  "autoload": {
-    "psr-4": {"Detain\\OAuth2\\Server\\Repository\\MyDb\\" : "src"}
-  },
-  "require": {
-    "league/oauth2-server": ">=6.1.1,<8.3.2",
-    "ext-pdo": "*"
-  },
-  "require-dev": {
-    "phpunit/phpunit": ">=6.0"
-  }
 }

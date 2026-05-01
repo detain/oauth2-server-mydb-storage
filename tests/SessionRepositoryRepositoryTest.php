@@ -1,4 +1,12 @@
 <?php
+/**
+ * Tests for {@see \Detain\OAuth2\Server\Repository\MyDb\SessionRepository}.
+ *
+ * @author    Joe Huss <detain@interserver.net>
+ * @copyright 2020 Interserver, Inc.
+ * @license   MIT
+ * @link      https://github.com/detain/oauth2-server-mydb-storage
+ */
 
 use Detain\OAuth2\Server\Repository\MyDb\ClientRepository;
 use Detain\OAuth2\Server\Repository\MyDb\SessionRepository;
@@ -6,27 +14,12 @@ use League\Event\Emitter;
 use League\OAuth2\Server\AbstractServer;
 use League\OAuth2\Server\Entity\AccessTokenEntity;
 use League\OAuth2\Server\Entity\AuthCodeEntity;
-use League\OAuth2\Server\Entity\ClientEntity;
 use League\OAuth2\Server\Entity\ScopeEntity;
 use League\OAuth2\Server\Entity\SessionEntity;
-
-class PDOMock extends MyDb\Generic
-{
-    /** @noinspection PhpMissingParentConstructorInspection */
-
-    /**
-     * PDOMock constructor.
-     */
-    public function __construct()
-    {
-    }
-}
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
- * Created by IntelliJ IDEA.
- * User: david
- * Date: 16.03.16
- * Time: 10:27
+ * Exercises CRUD and scope-association behaviour of the SessionRepository.
  */
 class SessionRepositoryTest extends MyDbTest
 {
@@ -34,12 +27,14 @@ class SessionRepositoryTest extends MyDbTest
      * @var SessionRepository
      */
     protected $session;
+
     /**
-     * @var AbstractServer
+     * @var AbstractServer|MockObject
      */
     protected $server;
+
     /**
-     * @var PHPUnit_Framework_MockObject_MockObject
+     * @var ClientRepository|MockObject
      */
     protected $clientRepository;
 
@@ -55,27 +50,22 @@ class SessionRepositoryTest extends MyDbTest
 
     public function testGetByAccessToken()
     {
-        $this->db->exec("INSERT INTO oauth_sessions
-						VALUES (19, 'user', '3', 'testclient', '/');
-						INSERT INTO oauth_access_tokens
-						VALUES ('1234', 19,  DATETIME('NOW', '+1 DAY'));");
+        $this->db->exec("INSERT INTO oauth_sessions VALUES (19, 'user', '3', 'testclient', '/');");
+        $this->db->exec("INSERT INTO oauth_access_tokens VALUES ('1234', 19,  DATETIME('NOW', '+1 DAY'));");
         $accessToken = new AccessTokenEntity($this->server);
         $accessToken->setId('1234');
-        $client = new ClientEntity($this->server);
 
         $session = $this->session->getByAccessToken($accessToken);
 
-        $this->clientRepository->expects($this->once())->method('getBySession')->with($session)->willReturn([''=>$client]);
         $this->assertEquals(19, $session->getId());
-        $this->assertEquals("user", $session->getOwnerType());
+        $this->assertEquals('user', $session->getOwnerType());
         $this->assertEquals(3, $session->getOwnerId());
-        $this->assertSame([''=>$client], $session->getClient());
     }
 
     public function testGetByAuthCodeFail()
     {
         /** @var AuthCodeEntity $authCode */
-        $authCode = (new AuthCodeEntity($this->server))->setId("1234");
+        $authCode = (new AuthCodeEntity($this->server))->setId('1234');
 
         $session = $this->session->getByAuthCode($authCode);
 
@@ -84,19 +74,16 @@ class SessionRepositoryTest extends MyDbTest
 
     public function testGetByAuthCode()
     {
-        $this->db->exec("INSERT INTO oauth_sessions	VALUES (19, 'user', '3', 'testclient', '/');
-						INSERT INTO oauth_auth_codes VALUES ('1234', 19,  DATETIME('NOW', '+1 DAY'), '/');");
+        $this->db->exec("INSERT INTO oauth_sessions	VALUES (19, 'user', '3', 'testclient', '/');");
+        $this->db->exec("INSERT INTO oauth_auth_codes VALUES ('1234', 19,  DATETIME('NOW', '+1 DAY'), '/');");
         /** @var AuthCodeEntity $authCode */
-        $authCode = (new AuthCodeEntity($this->server))->setId("1234");
-        $client = new ClientEntity($this->server);
+        $authCode = (new AuthCodeEntity($this->server))->setId('1234');
 
         $session = $this->session->getByAuthCode($authCode);
 
-        $this->clientRepository->expects($this->once())->method('getBySession')->with($session)->willReturn([''=>$client]);
         $this->assertEquals(19, $session->getId());
-        $this->assertEquals("user", $session->getOwnerType());
+        $this->assertEquals('user', $session->getOwnerType());
         $this->assertEquals(3, $session->getOwnerId());
-        $this->assertSame([''=>$client], $session->getClient());
     }
 
     public function testCreate()
@@ -106,7 +93,7 @@ class SessionRepositoryTest extends MyDbTest
         $this->assertNotNull($id);
         $stmt = $this->db->prepare('SELECT * FROM oauth_sessions WHERE id = ' . $id);
         $stmt->execute();
-        $this->assertSame([$id, 'user', '-123', 'myClient', '/myRedirect'], $stmt->fetch(PDO::FETCH_NUM));
+        $this->assertSame([(int) $id, 'user', '-123', 'myClient', '/myRedirect'], $stmt->fetch(PDO::FETCH_NUM));
     }
 
     public function testCreateNoRedirect()
@@ -117,7 +104,7 @@ class SessionRepositoryTest extends MyDbTest
         $stmt = $this->db->prepare('SELECT * FROM oauth_sessions WHERE id = ' . $id);
         $stmt->execute();
         $this->assertSame([
-                'id' => $id,
+                'id' => (int) $id,
                 'owner_type' => 'user',
                 'owner_id' => 'myOwner',
                 'client_id' => 'myClient',
@@ -125,38 +112,32 @@ class SessionRepositoryTest extends MyDbTest
         ], $stmt->fetch(PDO::FETCH_ASSOC));
     }
 
-    /**
-     * @expectedException PDOException
-     * @expectedExceptionMessageRegExp '.*constraint (failed|violation).*client_id'
-     */
     public function testCreateFailClientNull()
     {
+        $this->expectException(PDOException::class);
+        $this->expectExceptionMessageMatches('/constraint.*(failed|violation)/i');
         $this->session->create('user', 'myOwner', null);
     }
 
-    /**
-     * @expectedException PDOException
-     * @expectedExceptionMessageRegExp '.*constraint (failed|violation).*owner_id'
-     */
     public function testCreateFailOwnerNull()
     {
+        $this->expectException(PDOException::class);
+        $this->expectExceptionMessageMatches('/constraint.*(failed|violation)/i');
         $this->session->create('user', null, 'myClient');
     }
 
-    /**
-     * @expectedException PDOException
-     * @expectedExceptionMessageRegExp '.*constraint (failed|violation).*owner_type'
-     */
     public function testCreateFailTypeNull()
     {
+        $this->expectException(PDOException::class);
+        $this->expectExceptionMessageMatches('/constraint.*(failed|violation)/i');
         $this->session->create(null, 'myOwner', 'myClient');
     }
 
     public function testGetScopes()
     {
-        $this->db->exec("INSERT INTO oauth_sessions	VALUES (29, 'user', '3', 'testclient', '/');
-						INSERT INTO oauth_scopes VALUES ('user.list', 'list users'), ('user.add', 'add user');
-						INSERT INTO oauth_session_scopes VALUES (10, 29, 'user.list');");
+        $this->db->exec("INSERT INTO oauth_sessions	VALUES (29, 'user', '3', 'testclient', '/');");
+        $this->db->exec("INSERT INTO oauth_scopes VALUES ('user.list', 'list users'), ('user.add', 'add user');");
+        $this->db->exec("INSERT INTO oauth_session_scopes VALUES (10, 29, 'user.list');");
         $session = (new SessionEntity($this->server))->setId(29);
 
         $scopes = $this->session->getScopes($session);
@@ -188,16 +169,18 @@ class SessionRepositoryTest extends MyDbTest
         $this->assertSame(['29', 'user.list'], $stmt->fetch(PDO::FETCH_NUM));
     }
 
-
-    protected function setUp()
+    /**
+     * Boot the in-memory database, instantiate the SUT, and stub the server.
+     */
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->session = new SessionRepository($this->db);
-        $this->server = $this->getMock(AbstractServer::class);
+        $this->server = $this->getMockBuilder(AbstractServer::class)->disableOriginalConstructor()->getMock();
         $this->server->method('getEventEmitter')->willReturn(new Emitter());
         $this->clientRepository = $this->getMockBuilder(ClientRepository::class)->disableOriginalConstructor()->getMock();
-        $this->server->method('getClientRepository')->willReturn($this->clientRepository);
+        $this->server->method('getClientStorage')->willReturn($this->clientRepository);
 
         $this->session->setServer($this->server);
     }

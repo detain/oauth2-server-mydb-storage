@@ -1,13 +1,19 @@
 <?php
+/**
+ * Tests for {@see \Detain\OAuth2\Server\Repository\MyDb\ScopeRepository}.
+ *
+ * @author    Joe Huss <detain@interserver.net>
+ * @copyright 2020 Interserver, Inc.
+ * @license   MIT
+ * @link      https://github.com/detain/oauth2-server-mydb-storage
+ */
 
 use Detain\OAuth2\Server\Repository\MyDb\ScopeRepository;
 use League\OAuth2\Server\AbstractServer;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
- * Created by IntelliJ IDEA.
- * User: david
- * Date: 16.03.16
- * Time: 23:00
+ * Exercises lookup behaviour of the ScopeRepository.
  */
 class ScopeRepositoryTest extends MyDbTest
 {
@@ -15,8 +21,9 @@ class ScopeRepositoryTest extends MyDbTest
      * @var ScopeRepository
      */
     protected $scope;
+
     /**
-     * @var AbstractServer
+     * @var AbstractServer|MockObject
      */
     protected $server;
 
@@ -38,12 +45,14 @@ class ScopeRepositoryTest extends MyDbTest
         $this->assertEquals('list users', $scope->getDescription());
     }
 
-
-    protected function setUp()
+    /**
+     * Boot the in-memory database and instantiate the SUT.
+     */
+    protected function setUp(): void
     {
         parent::setUp();
         $this->scope = new ScopeRepository($this->db);
-        $this->server = $this->getMock(AbstractServer::class);
+        $this->server = $this->getMockBuilder(AbstractServer::class)->disableOriginalConstructor()->getMock();
 
         $this->scope->setServer($this->server);
     }

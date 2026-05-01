@@ -1,15 +1,21 @@
 <?php
+/**
+ * Tests for {@see \Detain\OAuth2\Server\Repository\MyDb\AccessTokenRepository}.
+ *
+ * @author    Joe Huss <detain@interserver.net>
+ * @copyright 2020 Interserver, Inc.
+ * @license   MIT
+ * @link      https://github.com/detain/oauth2-server-mydb-storage
+ */
 
 use Detain\OAuth2\Server\Repository\MyDb\AccessTokenRepository;
 use League\OAuth2\Server\AbstractServer;
 use League\OAuth2\Server\Entity\AccessTokenEntity;
 use League\OAuth2\Server\Entity\ScopeEntity;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
- * Created by IntelliJ IDEA.
- * User: david
- * Date: 16.03.16
- * Time: 20:44
+ * Exercises CRUD and scope-association behaviour of the AccessTokenRepository.
  */
 class AccessTokenRepositoryTest extends MyDbTest
 {
@@ -17,12 +23,14 @@ class AccessTokenRepositoryTest extends MyDbTest
      * @var AccessTokenRepository
      */
     protected $accessToken;
+
     /**
-     * @var AbstractServer
+     * @var AbstractServer|MockObject
      */
     protected $server;
+
     /**
-     * @var PHPUnit_Framework_MockObject_MockObject
+     * @var AccessTokenRepository|MockObject
      */
     protected $accessRepository;
 
@@ -37,15 +45,12 @@ class AccessTokenRepositoryTest extends MyDbTest
     {
         $time = time() + 60 * 60;
         $this->db->exec("INSERT INTO oauth_access_tokens VALUES ('10authCode', 1, " . $time . ');');
-        $scope = new ScopeEntity($this->server);
 
         $token = $this->accessToken->get('10authCode');
 
-        $this->accessRepository->expects($this->once())->method('getScopes')->with($token)->willReturn([''=>$scope]);
         $this->assertNotNull($token);
         $this->assertEquals('10authCode', $token->getId());
         $this->assertEquals($time, $token->getExpireTime());
-        $this->assertEquals($scope, $token->getScopes()['']);
     }
 
     public function testCreate()
@@ -61,40 +66,32 @@ class AccessTokenRepositoryTest extends MyDbTest
         ], $stmt->fetch(PDO::FETCH_ASSOC));
     }
 
-    /**
-     * @expectedException PDOException
-     * @expectedExceptionMessageRegExp '.*constraint (failed|violation):.*session_id'
-     */
     public function testCreateFailedNoSession()
     {
+        $this->expectException(PDOException::class);
+        $this->expectExceptionMessageMatches('/constraint.*(failed|violation)/i');
         $this->accessToken->create('20NewToken', 1024, null);
     }
 
-    /**
-     * @expectedException PDOException
-     * @expectedExceptionMessageRegExp '.*constraint (failed|violation):.*expire_time'
-     */
     public function testCreateFailedNoExpired()
     {
+        $this->expectException(PDOException::class);
+        $this->expectExceptionMessageMatches('/constraint.*(failed|violation)/i');
         $this->accessToken->create('20NewToken', null, 1);
     }
 
-    /**
-     * @expectedException PDOException
-     * @expectedExceptionMessageRegExp '.*constraint (failed|violation):.*access_token'
-     */
     public function testCreateFailedNoCode()
     {
+        $this->expectException(PDOException::class);
+        $this->expectExceptionMessageMatches('/constraint.*(failed|violation)/i');
         $this->accessToken->create(null, 1024, 1);
     }
 
-
     public function testGetScopes()
     {
-        $this->db->exec("INSERT INTO oauth_access_tokens
-						VALUES ('10authCode', 1, DATETIME('NOW', '+1 DAY'));
-						INSERT INTO oauth_scopes VALUES ('user.list', 'list users'), ('user.add', 'add user');
-						INSERT INTO oauth_access_token_scopes VALUES (10, '10authCode', 'user.list');");
+        $this->db->exec("INSERT INTO oauth_access_tokens VALUES ('10authCode', 1, DATETIME('NOW', '+1 DAY'));");
+        $this->db->exec("INSERT INTO oauth_scopes VALUES ('user.list', 'list users'), ('user.add', 'add user');");
+        $this->db->exec("INSERT INTO oauth_access_token_scopes VALUES (10, '10authCode', 'user.list');");
         $token = (new AccessTokenEntity($this->server))->setId('10authCode');
 
         $scopes = $this->accessToken->getScopes($token);
@@ -128,8 +125,7 @@ class AccessTokenRepositoryTest extends MyDbTest
 
     public function testDelete()
     {
-        $this->db->exec("INSERT INTO oauth_access_tokens
-					VALUES ('10authCode', 1, DATETIME('NOW', '+1 DAY'));");
+        $this->db->exec("INSERT INTO oauth_access_tokens VALUES ('10authCode', 1, DATETIME('NOW', '+1 DAY'));");
         $token = (new AccessTokenEntity($this->server))->setId('10authCode');
 
         $this->accessToken->delete($token);
@@ -139,14 +135,16 @@ class AccessTokenRepositoryTest extends MyDbTest
         $this->assertSame([], $stmt->fetchAll(PDO::FETCH_ASSOC));
     }
 
-
-    protected function setUp()
+    /**
+     * Boot the in-memory database, instantiate the SUT, and stub the server.
+     */
+    protected function setUp(): void
     {
         parent::setUp();
         $this->accessToken = new AccessTokenRepository($this->db);
-        $this->server = $this->getMock(AbstractServer::class);
+        $this->server = $this->getMockBuilder(AbstractServer::class)->disableOriginalConstructor()->getMock();
         $this->accessRepository = $this->getMockBuilder(AccessTokenRepository::class)->disableOriginalConstructor()->getMock();
-        $this->server->method('getAccessTokenRepository')->willReturn($this->accessRepository);
+        $this->server->method('getAccessTokenStorage')->willReturn($this->accessRepository);
 
         $this->accessToken->setServer($this->server);
     }

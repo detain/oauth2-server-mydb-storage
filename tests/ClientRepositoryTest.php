@@ -1,14 +1,21 @@
 <?php
+/**
+ * Tests for {@see \Detain\OAuth2\Server\Repository\MyDb\ClientRepository}.
+ *
+ * @author    Joe Huss <detain@interserver.net>
+ * @copyright 2020 Interserver, Inc.
+ * @license   MIT
+ * @link      https://github.com/detain/oauth2-server-mydb-storage
+ */
 
 use Detain\OAuth2\Server\Repository\MyDb\ClientRepository;
 use League\OAuth2\Server\AbstractServer;
 use League\OAuth2\Server\Entity\SessionEntity;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
- * Created by IntelliJ IDEA.
- * User: david
- * Date: 16.03.16
- * Time: 18:11
+ * Exercises lookup behaviour of the ClientRepository, including secret /
+ * redirect-URI validation and session-based fetches.
  */
 class ClientRepositoryTest extends MyDbTest
 {
@@ -16,8 +23,9 @@ class ClientRepositoryTest extends MyDbTest
      * @var ClientRepository
      */
     protected $client;
+
     /**
-     * @var AbstractServer
+     * @var AbstractServer|MockObject
      */
     protected $server;
 
@@ -60,8 +68,7 @@ class ClientRepositoryTest extends MyDbTest
 
     public function testGetBySessionFailed()
     {
-        $this->db->exec('INSERT INTO oauth_sessions
-						VALUES (100,"10Client","client", "10Owner", NULL )');
+        $this->db->exec('INSERT INTO oauth_sessions VALUES (100, "client", "10Owner", "10Client", NULL )');
         $session = (new SessionEntity($this->server))->setId(29);
 
         $client = $this->client->getBySession($session);
@@ -71,8 +78,7 @@ class ClientRepositoryTest extends MyDbTest
 
     public function testGetBySession()
     {
-        $exec = $this->db->exec('INSERT INTO oauth_sessions
-						VALUES (100, "client", "10Owner", "10Client", NULL )');
+        $exec = $this->db->exec('INSERT INTO oauth_sessions VALUES (100, "client", "10Owner", "10Client", NULL )');
         $session = (new SessionEntity($this->server))->setId(100);
 
         $client = $this->client->getBySession($session);
@@ -83,16 +89,17 @@ class ClientRepositoryTest extends MyDbTest
         $this->assertEquals('10Name', $client->getName());
     }
 
-
-    protected function setUp()
+    /**
+     * Seed two clients and a redirect URI before each test.
+     */
+    protected function setUp(): void
     {
         parent::setUp();
         $this->client = new ClientRepository($this->db);
-        $this->server = $this->getMock(AbstractServer::class);
+        $this->server = $this->getMockBuilder(AbstractServer::class)->disableOriginalConstructor()->getMock();
 
         $this->client->setServer($this->server);
-        $this->db->exec('INSERT INTO oauth_clients
-						VALUES ("10Client","10Secret","10Name"), ("11Client","11Secret","11Name")');
-        $this->db->exec('INSERT INTO oauth_client_redirect_uris VALUES (20, "11Client", "/11Redirect")');
+        $this->db->exec('INSERT INTO oauth_clients (id, secret, name) VALUES ("10Client","10Secret","10Name"), ("11Client","11Secret","11Name")');
+        $this->db->exec('INSERT INTO oauth_client_redirect_uris (id, client_id, redirect_uri) VALUES (20, "11Client", "/11Redirect")');
     }
 }

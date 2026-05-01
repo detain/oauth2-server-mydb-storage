@@ -1,40 +1,56 @@
 <?php
+/**
+ * Access Token Repository for the MyDb storage adapter.
+ *
+ * Implements the `AccessTokenInterface` from `league/oauth2-server` against
+ * the `oauth_access_tokens` and `oauth_access_token_scopes` MySQL tables.
+ *
+ * @author    Joe Huss <detain@interserver.net>
+ * @copyright 2020 Interserver, Inc.
+ * @license   MIT
+ * @link      https://github.com/detain/oauth2-server-mydb-storage
+ * @package   Detain\OAuth2\Server\Repository\MyDb
+ */
 
 namespace Detain\OAuth2\Server\Repository\MyDb;
 
 use League\OAuth2\Server\Entity\AccessTokenEntity;
 use League\OAuth2\Server\Entity\ScopeEntity;
-use League\OAuth2\Server\Repository\AccessTokenInterface;
+use League\OAuth2\Server\Storage\AccessTokenInterface;
 use PDOException;
 
+/**
+ * Persists OAuth2 access tokens and their scope associations in MyDb.
+ */
 class AccessTokenRepository extends Repository implements AccessTokenInterface
 {
     /**
-     * Get an instance of Entity\AccessTokenEntity
+     * Look up an access token by its ID.
      *
-     * @param string $token The access token
+     * @param string $token The access token string.
      *
-     * @return AccessTokenEntity | null
+     * @return AccessTokenEntity|null The hydrated entity, or `null` if no match.
      */
     public function get($token)
     {
         $this->db->query('SELECT * FROM oauth_access_tokens WHERE access_token = "'.$this->db->real_escape($token).'"');
         if ($this->db->num_rows() === 1) {
-            $this->db->next_record(MYSQL_ASSOC);
-            $token = new AccessTokenEntity($this->server);
-            $token->setId($this->db->Record['access_token']);
-            $token->setExpireTime($this->db->Record['expire_time']);
-            return $token;
+            $this->db->next_record(MYSQLI_ASSOC);
+            $entity = new AccessTokenEntity($this->server);
+            $entity->setId($this->db->Record['access_token']);
+            $entity->setExpireTime($this->db->Record['expire_time']);
+            return $entity;
         }
         return null;
     }
 
     /**
-     * Get the scopes for an access token
+     * Get all scopes attached to a given access token.
      *
-     * @param AccessTokenEntity $token The access token
+     * @param AccessTokenEntity $token The access token entity.
      *
-     * @return ScopeEntity[] Array of \League\OAuth2\Server\Entity\ScopeEntity
+     * @return ScopeEntity[] Array of `\League\OAuth2\Server\Entity\ScopeEntity`.
+     *
      * @throws PDOException
      */
     public function getScopes(AccessTokenEntity $token)
@@ -51,24 +67,29 @@ class AccessTokenRepository extends Repository implements AccessTokenInterface
     }
 
     /**
-     * Creates a new access token
+     * Create a new access token row.
      *
-     * @param string $token The access token
-     * @param integer $expireTime The expire time expressed as a unix timestamp
-     * @param string|integer $sessionId The session ID
+     * @param string         $token      The access token string.
+     * @param int            $expireTime Expiry as a unix timestamp.
+     * @param string|int     $sessionId  The owning session's ID.
      *
      * @return void
      */
     public function create($token, $expireTime, $sessionId)
     {
-        $this->db->query('INSERT INTO oauth_access_tokens (access_token, expire_time, session_id) VALUES ("'.$this->db->real_escape($token).'","'.$this->db->real_escape($expireTime).'","'.$this->db->real_escape($sessionId).'")');
+        $values = [
+            $this->sqlValue($token),
+            $this->sqlValue($expireTime),
+            $this->sqlValue($sessionId),
+        ];
+        $this->db->query('INSERT INTO oauth_access_tokens (access_token, expire_time, session_id) VALUES ('.implode(',', $values).')');
     }
 
     /**
-     * Associate a scope with an acess token
+     * Associate a scope with an access token.
      *
-     * @param AccessTokenEntity $token The access token
-     * @param ScopeEntity $scope The scope
+     * @param AccessTokenEntity $token The access token entity.
+     * @param ScopeEntity       $scope The scope entity to associate.
      *
      * @return void
      */
@@ -78,9 +99,9 @@ class AccessTokenRepository extends Repository implements AccessTokenInterface
     }
 
     /**
-     * Delete an access token
+     * Delete an access token row.
      *
-     * @param AccessTokenEntity $token The access token to delete
+     * @param AccessTokenEntity $token The access token entity to delete.
      *
      * @return void
      */

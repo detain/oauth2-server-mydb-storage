@@ -1,58 +1,82 @@
 <?php
+/**
+ * Authorization Code Repository for the MyDb storage adapter.
+ *
+ * Implements the `AuthCodeInterface` from `league/oauth2-server` against the
+ * `oauth_auth_codes` and `oauth_auth_code_scopes` MySQL tables.
+ *
+ * @author    Joe Huss <detain@interserver.net>
+ * @copyright 2020 Interserver, Inc.
+ * @license   MIT
+ * @link      https://github.com/detain/oauth2-server-mydb-storage
+ * @package   Detain\OAuth2\Server\Repository\MyDb
+ */
 
 namespace Detain\OAuth2\Server\Repository\MyDb;
 
 use League\OAuth2\Server\Entity\AuthCodeEntity;
 use League\OAuth2\Server\Entity\ScopeEntity;
-use League\OAuth2\Server\Repository\AuthCodeInterface;
+use League\OAuth2\Server\Storage\AuthCodeInterface;
 use PDOException;
 
+/**
+ * Persists OAuth2 authorization codes and their scope associations in MyDb.
+ */
 class AuthCodeRepository extends Repository implements AuthCodeInterface
 {
     /**
-     * Get the auth code
+     * Look up an authorization code by its ID.
      *
-     * @param string $code
+     * @param string $code The auth code string.
      *
-     * @return AuthCodeEntity | null
+     * @return AuthCodeEntity|null The hydrated entity, or `null` if no match.
+     *
      * @throws PDOException
      */
     public function get($code)
     {
         $this->db->query('SELECT * FROM oauth_auth_codes WHERE auth_code = "'.$this->db->real_escape($code).'"');
         if ($this->db->num_rows() === 1) {
-            $this->db->next_record(MYSQL_ASSOC);
-            $token = new AuthCodeEntity($this->server);
-            $token->setId($this->db->Record['auth_code']);
-            $token->setRedirectUri($this->db->Record['client_redirect_uri']);
-            $token->setExpireTime($this->db->Record['expire_time']);
-            return $token;
+            $this->db->next_record(MYSQLI_ASSOC);
+            $entity = new AuthCodeEntity($this->server);
+            $entity->setId($this->db->Record['auth_code']);
+            $entity->setRedirectUri($this->db->Record['client_redirect_uri']);
+            $entity->setExpireTime($this->db->Record['expire_time']);
+            return $entity;
         }
         return null;
     }
 
     /**
-     * Create an auth code.
+     * Create a new authorization code row.
      *
-     * @param string $token The token ID
-     * @param integer $expireTime Token expire time
-     * @param integer $sessionId Session identifier
-     * @param string $redirectUri Client redirect uri
+     * @param string $token       The auth code string.
+     * @param int    $expireTime  Expiry as a unix timestamp.
+     * @param int    $sessionId   Owning session ID.
+     * @param string $redirectUri Client redirect URI.
      *
      * @return void
+     *
      * @throws PDOException
      */
     public function create($token, $expireTime, $sessionId, $redirectUri)
     {
-        $this->db->query('INSERT INTO oauth_auth_codes (auth_code, expire_time, session_id, client_redirect_uri) VALUES ("'.$this->db->real_escape($token).'","'.$this->db->real_escape($expireTime).'","'.$this->db->real_escape($sessionId).'","'.$this->db->real_escape($redirectUri).'")');
+        $values = [
+            $this->sqlValue($token),
+            $this->sqlValue($expireTime),
+            $this->sqlValue($sessionId),
+            $this->sqlValue($redirectUri),
+        ];
+        $this->db->query('INSERT INTO oauth_auth_codes (auth_code, expire_time, session_id, client_redirect_uri) VALUES ('.implode(',', $values).')');
     }
 
     /**
-     * Get the scopes for an access token
+     * Get all scopes attached to a given authorization code.
      *
-     * @param AuthCodeEntity $token The auth code
+     * @param AuthCodeEntity $token The auth code entity.
      *
-     * @return ScopeEntity[] Array of \League\OAuth2\Server\Entity\ScopeEntity
+     * @return ScopeEntity[] Array of `\League\OAuth2\Server\Entity\ScopeEntity`.
+     *
      * @throws PDOException
      */
     public function getScopes(AuthCodeEntity $token)
@@ -69,12 +93,13 @@ class AuthCodeRepository extends Repository implements AuthCodeInterface
     }
 
     /**
-     * Associate a scope with an acess token
+     * Associate a scope with an authorization code.
      *
-     * @param AuthCodeEntity $token The auth code
-     * @param ScopeEntity $scope The scope
+     * @param AuthCodeEntity $token The auth code entity.
+     * @param ScopeEntity    $scope The scope entity to associate.
      *
      * @return void
+     *
      * @throws PDOException
      */
     public function associateScope(AuthCodeEntity $token, ScopeEntity $scope)
@@ -83,9 +108,9 @@ class AuthCodeRepository extends Repository implements AuthCodeInterface
     }
 
     /**
-     * Delete an access token
+     * Delete an authorization code row.
      *
-     * @param AuthCodeEntity $token The access token to delete
+     * @param AuthCodeEntity $token The auth code entity to delete.
      *
      * @return void
      */
